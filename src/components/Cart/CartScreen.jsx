@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import { useContext } from 'react';
 import { Container, Row, Col, ListGroup, Image, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
@@ -7,50 +6,21 @@ import { Link } from 'react-router-dom';
 import AppContext from '../../context/app-context';
 
 const CartScreen = () => {
-  const [saveProduct, setSaveProduct] = useState([]);
-  const [update, setUpdate] = useState(false);
-  const ctx = useContext(AppContext);
+  const {
+    cartItems,
+    subtractFromCart,
+    addToCartHandler,
+    removeFromCartHandler,
+    saveForLaterHandler,
+    moveToCartHandler,
+    saveProduct,
+  } = useContext(AppContext);
 
-  console.log('cart items', ctx.cartItems);
+  // console.log('cart items', cartItems);
 
-  const addToCart = (idx) => {
-    setUpdate(!update);
-    ctx.cartItems[idx] = {
-      ...ctx.cartItems[idx],
-      qty: Number(ctx.cartItems[idx].qty + 1),
-    };
-  };
-
-  const subtractFromCart = (idx) => {
-    setUpdate(!update);
-    ctx.cartItems[idx] = {
-      ...ctx.cartItems[idx],
-      qty: Number(ctx.cartItems[idx].qty - 1),
-    };
-  };
-
-  const removeFromCartHandler = (id) => {
-    ctx.cartItems = ctx.cartItems.filter((item) => item.id !== id);
-    console.log('Filter items', ctx.cartItems);
-    setUpdate(!update);
-  };
-
-  const saveForLaterHandler = (item) => {
-    ctx.cartItems = ctx.cartItems.filter((p) => p.id !== item.id);
-    setSaveProduct([...saveProduct, item]);
-  };
-
-  const moveToCartHandler = (item) => {
-    ctx.cartItems.push(item);
-    const updateSavedProduct = saveProduct.filter((p) => p.id !== item.id);
-    setSaveProduct(updateSavedProduct);
-  };
   let val;
   const calculateTotalPrice = () => {
-    val = ctx.cartItems.reduce(
-      (prev, curr) => prev + curr?.qty * curr.price,
-      0
-    );
+    val = cartItems.reduce((prev, curr) => prev + curr?.qty * curr.price, 0);
     return val;
   };
 
@@ -59,11 +29,11 @@ const CartScreen = () => {
       <h1>Cart</h1>
       <Row className="my-5">
         <Col md={8}>
-          {ctx.cartItems.length === 0 ? (
+          {cartItems.length === 0 ? (
             <h3>Your cart is empty</h3>
           ) : (
             <ListGroup variant="flush">
-              {ctx.cartItems.map((item, i) => (
+              {cartItems.map((item) => (
                 <ListGroup.Item key={item.id}>
                   {/* {console.log(i)} */}
                   <Row>
@@ -81,14 +51,17 @@ const CartScreen = () => {
                     <Col md={2}>₹ {item.price}</Col>
                     <Col md={2}>
                       <Button
-                        onClick={() => subtractFromCart(i)}
+                        onClick={() => subtractFromCart(item.id)}
                         size="sm"
                         disabled={item.qty ? item.qty === 1 : false}
                       >
                         -
                       </Button>{' '}
                       {item.qty ? item.qty : 1}{' '}
-                      <Button onClick={() => addToCart(i)} size="sm">
+                      <Button
+                        onClick={() => addToCartHandler(item.id)}
+                        size="sm"
+                      >
                         +
                       </Button>
                     </Col>
@@ -121,8 +94,7 @@ const CartScreen = () => {
           <ListGroup variant="flush">
             <ListGroup.Item>
               <h2>
-                Subtotal{' '}
-                {ctx.cartItems.reduce((prev, curr) => prev + curr?.qty, 0)}
+                Subtotal {cartItems.reduce((prev, curr) => prev + curr?.qty, 0)}
               </h2>
               Total Price: <Col>₹ {calculateTotalPrice()}</Col>
             </ListGroup.Item>
@@ -136,7 +108,7 @@ const CartScreen = () => {
               <Button
                 type="button"
                 className="btn-block"
-                disabled={ctx.cartItems.length === 0}
+                disabled={cartItems.length === 0}
               >
                 Proceed To Checkout
               </Button>

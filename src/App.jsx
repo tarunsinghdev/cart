@@ -8,14 +8,80 @@ import ProductListScreen from './components/Products/ProductList/ProductListScre
 import AppContext from './context/app-context';
 
 const App = () => {
-  const [cartItems, setCartItems] = useState([]);
+  let [cartItems, setCartItems] = useState([]);
+  const [saveProduct, setSaveProduct] = useState([]);
 
-  const addToCart = (item) => {
-    setCartItems([...cartItems, item]);
+  const addToCart = (p) => {
+    let flag = 0;
+    const newCartItems = cartItems.map((item) => {
+      if (item.id === p.id) {
+        flag = 1;
+        return { ...item, qty: Number(item.qty + 1) };
+      } else {
+        return item;
+      }
+    });
+    if (flag) {
+      setCartItems(newCartItems);
+    } else {
+      setCartItems([...cartItems, p]);
+    }
+  };
+
+  const addToCartHandler = (id) => {
+    cartItems.forEach((item, i) =>
+      item.id === id
+        ? (cartItems[i] = {
+            ...cartItems[i],
+            qty: Number(cartItems[id].qty + 1),
+          })
+        : ''
+    );
+    setCartItems(cartItems);
+  };
+
+  const subtractFromCart = (id) => {
+    cartItems.forEach((item, i) =>
+      item.id === id
+        ? (cartItems[i] = {
+            ...cartItems[i],
+            qty: Number(cartItems[id].qty - 1),
+          })
+        : ''
+    );
+    setCartItems(cartItems);
+  };
+
+  const removeFromCartHandler = (id) => {
+    cartItems = cartItems.filter((item) => item.id !== id);
+    setCartItems(cartItems);
+  };
+
+  const saveForLaterHandler = (item) => {
+    cartItems = cartItems.filter((p) => p.id !== item.id);
+    setSaveProduct([...saveProduct, item]);
+    setCartItems(cartItems);
+  };
+
+  const moveToCartHandler = (item) => {
+    cartItems = [...cartItems, item];
+    const updateSavedProduct = saveProduct.filter((p) => p.id !== item.id);
+    setSaveProduct(updateSavedProduct);
+    setCartItems(cartItems);
   };
 
   return (
-    <AppContext.Provider value={{ cartItems: cartItems }}>
+    <AppContext.Provider
+      value={{
+        cartItems,
+        subtractFromCart,
+        addToCartHandler,
+        removeFromCartHandler,
+        saveForLaterHandler,
+        moveToCartHandler,
+        saveProduct,
+      }}
+    >
       <BrowserRouter>
         <Header />
         <Route exact path="/" component={ProductListScreen} />
