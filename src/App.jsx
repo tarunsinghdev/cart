@@ -29,27 +29,17 @@ const App = () => {
   };
 
   const addToCartHandler = (id) => {
-    cartItems.forEach((item, i) =>
-      item.id === id
-        ? (cartItems[i] = {
-            ...cartItems[i],
-            qty: Number(cartItems[id].qty + 1),
-          })
-        : ''
+    const newCartItems = cartItems.map((item) =>
+      item.id === id ? { ...item, qty: Number(item.qty + 1) } : item
     );
-    setCartItems(cartItems);
+    setCartItems(newCartItems);
   };
 
   const subtractFromCart = (id) => {
-    cartItems.forEach((item, i) =>
-      item.id === id
-        ? (cartItems[i] = {
-            ...cartItems[i],
-            qty: Number(cartItems[id].qty - 1),
-          })
-        : ''
+    const newCartItems = cartItems.map((item) =>
+      item.id === id ? { ...item, qty: Number(item.qty - 1) } : item
     );
-    setCartItems(cartItems);
+    setCartItems(newCartItems);
   };
 
   const removeFromCartHandler = (id) => {
