@@ -49,8 +49,13 @@ const App = () => {
 
   const saveForLaterHandler = (item) => {
     cartItems = cartItems.filter((p) => p.id !== item.id);
-    setSaveProduct([...saveProduct, item]);
-    setCartItems(cartItems);
+    const saveDuplicate = saveProduct.some((p) => p.id === item.id);
+    if (saveDuplicate) {
+      alert('Product already saved!');
+    } else {
+      setSaveProduct([...saveProduct, item]);
+      setCartItems(cartItems);
+    }
   };
 
   const moveToCartHandler = (item) => {
